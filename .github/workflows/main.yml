@@ -4,10 +4,11 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - master
       - 'feature/*'
 
 env:
+    # Host + DB portion only — protocol and credentials are injected by app.js
     MONGO_URI: 'supercluster.d83jj.mongodb.net/superData'
     MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
@@ -46,6 +47,7 @@ jobs:
         - name: Archive Test Result
           uses: actions/upload-artifact@v4
           with:
+            # Unique name per matrix cell — upload-artifact@v4 rejects duplicates
             name: Mocha-Test-Result-${{ matrix.nodejs_version }}-${{ matrix.operating_system }}
             path: test-results.xml
 

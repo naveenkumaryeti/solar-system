@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-// Load .env file for local development
+// Load .env file for local development (ignored when env vars already set)
 require('dotenv').config();
 
 const app = express();
@@ -14,10 +14,14 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '/')));
 app.use(cors());
 
-// MongoDB Connection - credentials injected into the full SRV URI
+// MongoDB Connection
+// Expects three separate env vars:
+//   MONGO_URI      = supercluster.d83jj.mongodb.net/superData
+//   MONGO_USERNAME = <username>
+//   MONGO_PASSWORD = <password>
+const MONGO_URI      = process.env.MONGO_URI;
 const MONGO_USERNAME = process.env.MONGO_USERNAME;
 const MONGO_PASSWORD = process.env.MONGO_PASSWORD;
-const MONGO_URI      = process.env.MONGO_URI;  // e.g. supercluster.d83jj.mongodb.net/superData
 
 mongoose.connect(
     `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_URI}?retryWrites=true&w=majority`,
@@ -49,7 +53,7 @@ const dataSchema = new Schema({
 // Model
 const planetModel = mongoose.model('planets', dataSchema);
 
-// Planet API
+// Planet API  –  async/await removes the uncovered callback-error branches
 app.post('/planet', async function (req, res) {
     try {
         const planetData = await planetModel.findOne({ id: req.body.id });

@@ -8,9 +8,9 @@ on:
       - 'feature/*'
 
 env:
-    MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData' 
-    MONGO_USERNAME: ${{ vars.MONGO_USERNAME}}
-    MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD}}
+    MONGO_URI: 'supercluster.d83jj.mongodb.net/superData'
+    MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
+    MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
 
 jobs:
     unit-testing:
@@ -23,26 +23,30 @@ jobs:
             exclude:
               - nodejs_version: 20
                 operating_system: macos-latest
-        runs-on: ${{matrix.operating_system}}
+        runs-on: ${{ matrix.operating_system }}
         steps:
         - name: Checkout Repository
           uses: actions/checkout@v4
 
-        - name: Setup NodeJS Version - ${{matrix.nodejs_version}}
+        - name: Setup NodeJS Version - ${{ matrix.nodejs_version }}
           uses: actions/setup-node@v3
           with:
-            node-version: ${{matrix.nodejs_version}}
+            node-version: ${{ matrix.nodejs_version }}
 
         - name: Install Dependencies
           run: npm install
 
-        - name: Unit Testing 
+        - name: Unit Testing
           run: npm test
-        
+          env:
+            MONGO_URI: ${{ env.MONGO_URI }}
+            MONGO_USERNAME: ${{ env.MONGO_USERNAME }}
+            MONGO_PASSWORD: ${{ env.MONGO_PASSWORD }}
+
         - name: Archive Test Result
           uses: actions/upload-artifact@v4
           with:
-            name: Mocha_Test-Result 
+            name: Mocha-Test-Result-${{ matrix.nodejs_version }}-${{ matrix.operating_system }}
             path: test-results.xml
 
     code-coverage:
@@ -62,7 +66,11 @@ jobs:
 
         - name: Check Code Coverage
           run: npm run coverage
-        
+          env:
+            MONGO_URI: ${{ env.MONGO_URI }}
+            MONGO_USERNAME: ${{ env.MONGO_USERNAME }}
+            MONGO_PASSWORD: ${{ env.MONGO_PASSWORD }}
+
         - name: Archive Test Result
           uses: actions/upload-artifact@v4
           with:

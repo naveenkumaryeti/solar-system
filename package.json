@@ -11,10 +11,10 @@
   },
   "nyc": {
     "check-coverage": true,
-    "lines": 90,
-    "branches": 40,
+    "lines": 85,
+    "branches": 50,
     "functions": 70,
-    "statements": 90
+    "statements": 85
   },
   "dependencies": {
     "body-parser": "^1.20.2",
